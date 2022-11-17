@@ -1,24 +1,11 @@
-from fastapi import FastAPI, Request, BackgroundTasks, Response, Cookie
-from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import RedirectResponse
-#from sqlalchemy import create_engine
-import traceback
-import sqlite3
-import uvicorn
-import os
 import os
 import openai
 from textblob import TextBlob
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 from transformers import pipeline
-import pandas as pd
-from fastapi.responses import RedirectResponse
-from typing import Optional
 
 
-'''Core Functions'''
 def get_user_playlists(username, sp):
     playlist_list = sp.user_playlists(username, limit=10)
     playlist_dict = {}
@@ -96,76 +83,12 @@ def spotify_process(username,playlist):
     # Image retrieval
     pics = get_pics(text)
     print(pics)
-
-    # write to table
-    df = pd.DataFrame([[username,pics[0]]], columns=['username','url'])
-    con = sqlite3.connect("temp.db")
-    df.to_sql(name=username, con=con, if_exists='replace', index=False)
     return pics
 
-''' APP Starts '''
-# Launch app and mount assets
-app = FastAPI()
-app.mount("/assets", StaticFiles(directory="assets"), name="assets")
-templates = Jinja2Templates(directory="templates")
-# init DB
-con = sqlite3.connect("temp.db")
 
-
-@app.get("/")
-async def home(request: Request):
-    try:
-        return templates.TemplateResponse('index.html', {"request": request})
-
-    except Exception as e:
-        print(e)
-        return templates.TemplateResponse('error.html', {"request": request})
-
-@app.post("/save_input")
-async def save_input(request: Request, background_tasks: BackgroundTasks):
-    try:
-        # Collect User Input
-        body = await request.body()
-        print(body)
-        out_list = []
-        for x in body.decode('UTF-8').split('&')[:-1]:
-            out_list.append(x.split('=')[1].replace('+', ' '))
-        print(out_list)
-        background_tasks.add_task(spotify_process, username=out_list[0], playlist=out_list[1])
-        response = RedirectResponse(url="/loading")
-        response.set_cookie("username", out_list[0])
-        return response
-
-    except Exception as e:
-        print(e)
-        return templates.TemplateResponse('error.html', {"request": request})
-
-@app.post("/loading")
-async def home(request: Request):
-    try:
-        return templates.TemplateResponse('loading.html', {"request": request})
-
-    except Exception as e:
-        print(e)
-        return templates.TemplateResponse('error.html', {"request": request})
+spotify_process('the_captain_jack','Chilly Morning')
 
 
 
 
-@app.get("/final")
-async def home(request: Request, username: Optional[bytes] = Cookie(None)):
-    try:
-        username = username.decode('UTF-8')
-        sql = f'''select * from {username}'''
-        df = pd.read_sql(sql, con=con)
-        url = df.url.values[0]
-        return templates.TemplateResponse('final.html', {"request": request, 'my_url':url})
 
-    except Exception as e:
-        print(e)
-        return templates.TemplateResponse('error.html', {"request": request})
-
-
-if __name__ == '__main__':
-    if os.environ['MODE'] == 'dev':
-        uvicorn.run(app, port=4242, host='0.0.0.0')
