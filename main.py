@@ -5,7 +5,7 @@ from fastapi.responses import RedirectResponse
 #from sqlalchemy import create_engine
 import traceback
 import sqlite3
-import uvicorn
+
 import os
 import os
 import openai
@@ -169,4 +169,5 @@ async def home(request: Request, username: Optional[bytes] = Cookie(None)):
 
 if __name__ == '__main__':
     if os.environ['MODE'] == 'dev':
+        import uvicorn
         uvicorn.run(app, port=4242, host='0.0.0.0')
