@@ -87,6 +87,7 @@ def spotify_process(username,playlist):
     # Song retrieval and Processing
     songs = get_playlist_tracks(username, playlists[playlist],sp)
     print('songs done')
+    print(songs)
     object_songs = get_object_songs(songs)
     print('song classification done')
     print('object songs:')
@@ -98,9 +99,9 @@ def spotify_process(username,playlist):
     print(pics)
 
     # write to table
-    df = pd.DataFrame([[username,pics[0]]], columns=['username','url'])
+    df = pd.DataFrame([[f'user_{username}',pics[0]]], columns=['username','url'])
     con = sqlite3.connect("temp.db")
-    df.to_sql(name=username, con=con, if_exists='replace', index=False)
+    df.to_sql(name=f'user_{username}', con=con, if_exists='replace', index=False)
     return pics
 
 ''' APP Starts '''
@@ -133,7 +134,7 @@ async def save_input(request: Request, background_tasks: BackgroundTasks):
         print(out_list)
         background_tasks.add_task(spotify_process, username=out_list[0], playlist=out_list[1])
         response = RedirectResponse(url="/loading")
-        response.set_cookie("username", out_list[0])
+        response.set_cookie("username", f'user_{out_list[0]}')
         return response
 
     except Exception as e:
