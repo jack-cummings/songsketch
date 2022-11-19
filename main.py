@@ -40,6 +40,7 @@ def get_playlist_tracks(username,playlist_id, sp):
 
 
 def get_object_songs(song_list):
+    #classifier = pipeline("zero-shot-classification", model = "./model")
     classifier = pipeline("zero-shot-classification")
     # candidate_labels = ["abstract", "concrete"]
     candidate_labels = ["object", "idea"]
