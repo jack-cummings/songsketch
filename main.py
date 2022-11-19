@@ -112,7 +112,7 @@ def spotify_process(username,playlist):
     print(pics)
 
     # write to table
-    df = pd.DataFrame([[f'user_{username}',pics[0]]], columns=['username','url'])
+    df = pd.DataFrame([[f'user_{username}',pics[0],text]], columns=['username','url','keywords'])
     con = sqlite3.connect("temp.db")
     df.to_sql(name=f'user_{username}', con=con, if_exists='replace', index=False)
     return pics
@@ -173,7 +173,8 @@ async def home(request: Request, username: Optional[bytes] = Cookie(None)):
         sql = f'''select * from {username}'''
         df = pd.read_sql(sql, con=con)
         url = df.url.values[0]
-        return templates.TemplateResponse('final.html', {"request": request, 'my_url':url})
+        keywords = df.keywords[0]
+        return templates.TemplateResponse('final.html', {"request": request, 'my_url':url, 'keywords':keywords})
 
     except Exception as e:
         print(e)
