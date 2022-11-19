@@ -6,4 +6,4 @@ transformers==4.24.0
 fastapi
 pandas
 jinja2
-tensorflow
+tensorflow-cpu
