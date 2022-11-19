@@ -5,14 +5,14 @@ from fastapi.responses import RedirectResponse
 #from sqlalchemy import create_engine
 import traceback
 import sqlite3
-
+import json
+import requests
 import os
 import os
 import openai
 from textblob import TextBlob
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
-from transformers import pipeline
 import pandas as pd
 from fastapi.responses import RedirectResponse
 from typing import Optional
@@ -40,14 +40,26 @@ def get_playlist_tracks(username,playlist_id, sp):
 
 
 def get_object_songs(song_list):
-    #classifier = pipeline("zero-shot-classification", model = "./model")
-    classifier = pipeline("zero-shot-classification")
-    # candidate_labels = ["abstract", "concrete"]
-    candidate_labels = ["object", "idea"]
-    preds = classifier(song_list, candidate_labels)
+    # #classifier = pipeline("zero-shot-classification", model = "./model")
+    # classifier = pipeline("zero-shot-classification")
+    # # candidate_labels = ["abstract", "concrete"]
+    # candidate_labels = ["object", "idea"]
+    #preds = classifier(song_list, candidate_labels)
+    headers = {"Authorization": f"Bearer {os.environ['hg_api_token']}"}
+    API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-mnli"
+    def query(payload):
+        data = json.dumps(payload)
+        response = requests.request("POST", API_URL, headers=headers, data=data)
+        return json.loads(response.content.decode("utf-8"))
+    data = query(
+        {
+            "inputs": song_list,
+            "parameters": {"candidate_labels": ["object", "idea"]},
+        }
+    )
     object_songs = []
     iterator = 0
-    for pred in preds:
+    for pred in data:
         if pred['labels'][0] == 'object':
             if pred['scores'][0] > .7:
                 object_songs.append(song_list[iterator])
