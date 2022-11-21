@@ -43,23 +43,33 @@
 <!-- end Navbar -->
 
 <!--Generic section-->
-<h2 class="card-title">Turn your Playlist into art</h2>
     <div class = "container">
-
+        <div class="text-muted font-weight-medium mt-2"> </div>
+            <div class="text-muted font-weight-medium mt-2"> </div>
+            <h2 class="card-title">Turn Playlists to Art</h2>
+            <div class="text-muted font-weight-medium mt-2"> </div>
+        <div class="text-muted font-weight-medium mt-2"> </div>
         <div class="card">
-
             <div class="card-body">
-                <div class="text-muted font-weight-medium mt-2"> </div>
-
                 <form method="post" action="save_input">
                     <div class="form-group">
-                        <h3 for="name">Spotify Username:</h3>
-                        <input id="username" name="name" placeholder="username" type="text" class="form-control">
+                        <h3 for="name">Link To Playlist:</h3>
+                        <input id="username" name="name" placeholder="https://open.spotify.com/playlist/37i9dQZF1DX0XUsuxWHRQd?si=81c3d23902ac4fec" type="text" class="form-control">
                     </div>
                     <div class="form-group">
-                        <h3 for="name">Playlist name:</h3>
-                        <input id="playlist_name" name="name" placeholder="My playlist" type="text" class="form-control">
+                    <h3 for="type">Artistic Style</h3>
+                    <div>
+                      <select id="style" name="style" required="required" class="form-select">
+                        <option value="Select">Select</option>
+                        <option value="Pop Art">Pop Art</option>
+                        <option value="Rustic Painting">Rustic Painting</option>
+                        <option value="Diagram">Diagram</option>
+                        <option value="Surreal Painting">Surreal Painting</option>
+                        <option value="Photograph">Photograph</option>
+                      </select>
                     </div>
+                    </div>
+                    <div class="text-muted font-weight-medium mt-2"> </div>
                     <div class="form-group">
                         <button name="submit" type="submit" class="btn btn-primary">Submit</button>
                     </div>

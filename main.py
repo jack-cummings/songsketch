@@ -16,6 +16,7 @@ from spotipy.oauth2 import SpotifyClientCredentials
 import pandas as pd
 from fastapi.responses import RedirectResponse
 from typing import Optional
+import random
 
 
 '''Core Functions'''
@@ -29,6 +30,17 @@ def get_user_playlists(username, sp):
 
 def get_playlist_tracks(username,playlist_id, sp):
     results = sp.user_playlist_tracks(username,playlist_id)
+    tracks = results['items']
+    while results['next']:
+        results = sp.next(results)
+        tracks.extend(results['items'])
+    songs = []
+    for track in tracks:
+        songs.append(track['track']['name'])
+    return songs
+
+def get_playlist_tracks_url(url,sp):
+    results = sp.playlist_tracks(url)
     tracks = results['items']
     while results['next']:
         results = sp.next(results)
@@ -75,15 +87,15 @@ def PPSongText(song_list):
     return textPP
 
 
-def get_pics(items):
-    prompt = f'pop art of A wimmelbilderbuch containing {items}'
+def get_pics(items,style):
+    prompt = f'{style} of A wimmelbilderbuch containing {items}'
     print(f'prompt: {prompt}')
     openai.api_key = os.environ["openai"]
     pics = openai.Image.create(prompt=prompt, n=1, size="512x512")
     urls = [item['url'] for item in pics['data']]
     return urls
 
-def spotify_process(username,playlist):
+def spotify_process(playlist_id,uniqueID, style):
     # init spotify
     client_id = os.environ['client_id']
     secret = os.environ['secret']
@@ -93,12 +105,15 @@ def spotify_process(username,playlist):
     # username = 'the_captain_jack'
     # playlist = 'Chilly Morning'
 
-    # playlsit retrieval
-    playlists = get_user_playlists(username,sp)
-    print('playlists done')
+    # # playlsit retrieval
+    # playlists = get_user_playlists(username,sp)
+    # print('playlists done')
+    #
+    # # Song retrieval and Processing
+    # songs = get_playlist_tracks(username, playlists[playlist],sp)
 
-    # Song retrieval and Processing
-    songs = get_playlist_tracks(username, playlists[playlist],sp)
+    # url song retrieval
+    songs = get_playlist_tracks_url(playlist_id,sp)
     print('songs done')
     print(songs)
     object_songs = get_object_songs(songs)
@@ -108,13 +123,13 @@ def spotify_process(username,playlist):
     print(text)
 
     # Image retrieval
-    pics = get_pics(text)
+    pics = get_pics(text,style)
     print(pics)
 
     # write to table
-    df = pd.DataFrame([[f'user_{username}',pics[0],text]], columns=['username','url','keywords'])
+    df = pd.DataFrame([[uniqueID,pics[0],text]], columns=['uniqueID','url','keywords'])
     con = sqlite3.connect("temp.db")
-    df.to_sql(name=f'user_{username}', con=con, if_exists='replace', index=False)
+    df.to_sql(name=uniqueID, con=con, if_exists='replace', index=False)
     return pics
 
 ''' APP Starts '''
@@ -129,7 +144,7 @@ con = sqlite3.connect("temp.db")
 @app.get("/")
 async def home(request: Request):
     try:
-        return templates.TemplateResponse('index.html', {"request": request})
+        return templates.TemplateResponse('index_v2.html', {"request": request})
 
     except Exception as e:
         print(e)
@@ -145,9 +160,11 @@ async def save_input(request: Request, background_tasks: BackgroundTasks):
         for x in body.decode('UTF-8').split('&')[:-1]:
             out_list.append(x.split('=')[1].replace('+', ' '))
         print(out_list)
-        background_tasks.add_task(spotify_process, username=out_list[0], playlist=out_list[1])
+        playlist_id = out_list[0].split('playlist')[1].split('%')[1][2:]
+        uniqueID = f'uid{random.randint(0,100000)}'
+        background_tasks.add_task(spotify_process, playlist_id=playlist_id, style=out_list[1], uniqueID=uniqueID)
         response = RedirectResponse(url="/loading")
-        response.set_cookie("username", f'user_{out_list[0]}')
+        response.set_cookie("uniqueID", uniqueID)
         return response
 
     except Exception as e:
@@ -167,10 +184,10 @@ async def home(request: Request):
 
 
 @app.get("/final")
-async def home(request: Request, username: Optional[bytes] = Cookie(None)):
+async def home(request: Request, uniqueID: Optional[bytes] = Cookie(None)):
     try:
-        username = username.decode('UTF-8')
-        sql = f'''select * from {username}'''
+        uniqueID = uniqueID.decode('UTF-8')
+        sql = f'''select * from {uniqueID}'''
         df = pd.read_sql(sql, con=con)
         url = df.url.values[0]
         keywords = df.keywords[0]
