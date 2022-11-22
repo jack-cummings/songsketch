@@ -106,7 +106,7 @@ def get_prompt(items,style):
         return 'rejected'
 
 def get_pics(prompt):
-    pics = openai.Image.create(prompt=prompt, n=1, size="256x256")
+    pics = openai.Image.create(prompt=prompt, n=3, size="256x256")
     urls = [item['url'] for item in pics['data']]
     return urls
 
@@ -208,7 +208,9 @@ async def home(request: Request, uniqueID: Optional[bytes] = Cookie(None)):
         if prompt != 'rejected':
             pics = get_pics(prompt)
             print(pics)
-            return templates.TemplateResponse('final.html', {"request": request, 'my_url': pics[0], 'keywords': keywords})
+            return templates.TemplateResponse('final_multi.html', {"request": request, 'url_1': pics[0],
+                                                             'url_2': pics[1], 'url_3': pics[2],
+                                                            'keywords': keywords})
         else:
             return templates.TemplateResponse('rejected.html', {"request": request, 'keywords': keywords})
 
