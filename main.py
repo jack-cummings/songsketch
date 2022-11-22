@@ -90,8 +90,7 @@ def PPSongText(song_list):
     textPP = ', '.join(tb.noun_phrases)
     return textPP
 
-
-def get_pics(items,style):
+def get_prompt(items,style):
     prompt = f'{style} of {items}'
     openai.api_key = os.environ["openai"]
     mod_raw = openai.Moderation.create(input=prompt)
@@ -102,11 +101,14 @@ def get_pics(items,style):
     prompt = re.sub(bad_words_pattern,'',prompt)
     print(f'prompt: {prompt}')
     if mod_raw['results'][0]['flagged'] == False:
-        pics = openai.Image.create(prompt=prompt, n=1, size="256x256")
-        urls = [item['url'] for item in pics['data']]
-        return urls
+        return prompt
     else:
         return 'rejected'
+
+def get_pics(prompt):
+    pics = openai.Image.create(prompt=prompt, n=1, size="256x256")
+    urls = [item['url'] for item in pics['data']]
+    return urls
 
 def spotify_process(playlist_id,uniqueID, style):
     # init spotify
@@ -135,15 +137,12 @@ def spotify_process(playlist_id,uniqueID, style):
     text = PPSongText(object_songs)
     print(text)
 
-    # Image retrieval
-    pics = get_pics(text,style)
-    print(pics)
-
+    prompt = get_prompt(text,style)
     # write to table
-    df = pd.DataFrame([[uniqueID,pics[0],text]], columns=['uniqueID','url','keywords'])
+    df = pd.DataFrame([[uniqueID,prompt,text]], columns=['uniqueID','prompt','keywords'])
     con = sqlite3.connect("temp.db")
     df.to_sql(name=uniqueID, con=con, if_exists='replace', index=False)
-    return pics
+    return prompt
 
 ''' APP Starts '''
 # Launch app and mount assets
@@ -202,12 +201,16 @@ async def home(request: Request, uniqueID: Optional[bytes] = Cookie(None)):
         uniqueID = uniqueID.decode('UTF-8')
         sql = f'''select * from {uniqueID}'''
         df = pd.read_sql(sql, con=con)
-        url = df.url.values[0]
+        prompt = df.prompt.values[0]
         keywords = df.keywords[0]
-        if url != 'rejected':
-            return templates.TemplateResponse('final.html', {"request": request, 'my_url':url, 'keywords':keywords})
+
+        # Image retrieval
+        if prompt != 'rejected':
+            pics = get_pics(prompt)
+            print(pics)
+            return templates.TemplateResponse('final.html', {"request": request, 'my_url': pics[0], 'keywords': keywords})
         else:
-            return templates.TemplateResponse('rejected.html', {"request": request, 'my_url': url, 'keywords': keywords})
+            return templates.TemplateResponse('rejected.html', {"request": request, 'keywords': keywords})
 
     except Exception as e:
         print(e)
