@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request, BackgroundTasks, Response, Cookie
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+import re
 from fastapi.responses import RedirectResponse
 #from sqlalchemy import create_engine
 import traceback
@@ -66,17 +67,20 @@ def get_object_songs(song_list):
     data = query(
         {
             "inputs": song_list,
-            "parameters": {"candidate_labels": ["object", "idea"]},
+            "parameters": {"candidate_labels": ["object", "abstract"]},
         }
     )
     object_songs = []
     iterator = 0
     for pred in data:
         if pred['labels'][0] == 'object':
-            if pred['scores'][0] > .7:
-                object_songs.append(song_list[iterator])
+            #if pred['scores'][0] > .7:
+            object_songs.append([song_list[iterator],pred['scores'][0]])
         iterator = iterator + 1
-    return object_songs
+    df = pd.DataFrame(object_songs, columns = ['song','object_score']).sort_values('object_score', ascending=False)
+    #head_len = int(round(df.shape[0]*.5,0))
+    top_object_songs = df.head(5)['song'].to_list()
+    return top_object_songs
 
 
 def PPSongText(song_list):
@@ -88,12 +92,21 @@ def PPSongText(song_list):
 
 
 def get_pics(items,style):
-    prompt = f'{style} of A wimmelbilderbuch containing {items}'
-    print(f'prompt: {prompt}')
+    prompt = f'{style} of {items}'
     openai.api_key = os.environ["openai"]
-    pics = openai.Image.create(prompt=prompt, n=1, size="512x512")
-    urls = [item['url'] for item in pics['data']]
-    return urls
+    mod_raw = openai.Moderation.create(input=prompt)
+    # custom prof check
+    f = open("assets/profane_words.json", 'r')
+    bad_words = json.load(f)
+    bad_words_pattern = ' | '.join(bad_words)
+    prompt = re.sub(bad_words_pattern,'',prompt)
+    print(f'prompt: {prompt}')
+    if mod_raw['results'][0]['flagged'] == False:
+        pics = openai.Image.create(prompt=prompt, n=1, size="256x256")
+        urls = [item['url'] for item in pics['data']]
+        return urls
+    else:
+        return 'rejected'
 
 def spotify_process(playlist_id,uniqueID, style):
     # init spotify
@@ -191,7 +204,10 @@ async def home(request: Request, uniqueID: Optional[bytes] = Cookie(None)):
         df = pd.read_sql(sql, con=con)
         url = df.url.values[0]
         keywords = df.keywords[0]
-        return templates.TemplateResponse('final.html', {"request": request, 'my_url':url, 'keywords':keywords})
+        if url != 'rejected':
+            return templates.TemplateResponse('final.html', {"request": request, 'my_url':url, 'keywords':keywords})
+        else:
+            return templates.TemplateResponse('rejected.html', {"request": request, 'my_url': url, 'keywords': keywords})
 
     except Exception as e:
         print(e)
