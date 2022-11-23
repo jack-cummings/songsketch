@@ -208,7 +208,7 @@ async def home(request: Request, uniqueID: Optional[bytes] = Cookie(None)):
         if prompt != 'rejected':
             pics = get_pics(prompt)
             print(pics)
-            return templates.TemplateResponse('final_multi.html', {"request": request, 'url_1': pics[0],
+            return templates.TemplateResponse('final_gallery.html', {"request": request, 'url_1': pics[0],
                                                              'url_2': pics[1], 'url_3': pics[2],
                                                             'keywords': keywords})
         else:
