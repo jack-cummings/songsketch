@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>SongSketch</title>
+
+    <!-- Bootstrap CSS / Color Scheme -->
+    <link rel="stylesheet" href="assets/css/lux.css" id="theme-color">
+
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+<!--start navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Song Scrape</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarColor01">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link active" href="#">Home
+            <span class="visually-hidden">(current)</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Features</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Pricing</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">About</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<!-- end Navbar -->
+
+<!--Generic section-->
+    <div class = "container">
+        <div class="text-muted font-weight-medium mt-2"> </div>
+            <div class="text-muted font-weight-medium mt-2"> </div>
+            <h3 class="card-title">Turn Playlists to Art</h3>
+            <div class="text-muted font-weight-medium mt-2"> </div>
+        <div class="text-muted font-weight-medium mt-2"> </div>
+        <div class="card">
+            <div class="card-body">
+                <form method="post" action="save_input">
+                    <div class="form-group">
+                        <h3 for="name">Link To Playlist:</h3>
+                        <input id="username" name="name" placeholder="https://open.spotify.com/playlist/37i9dQZF1DX0XUsuxWHRQd?si=81c3d23902ac4fec" type="text" class="form-control">
+                    </div>
+                    <div class="form-group">
+                    <div class="text-muted font-weight-medium mt-2"> </div>
+                    <h3 for="type">Artistic Style</h3>
+                    <div>
+                    <div class="text-muted font-weight-medium mt-2"> </div>
+                      <select id="style" name="style" required="required" class="form-select">
+                        <option value="Select">Select</option>
+                        <option value="Pop Art vaporware art deco screen print collage:">Pop Art</option>
+                        <option value="Rustic Painting landscape painting rustic aesthetic collage:">Rustic Painting</option>
+                        <option value="cyberpunk high detail sharp high quality lasers collage:">Cyberpunk</option>
+<!--                        <option value="artistic map lord of the rings map game of thrones map fantasy map antique map collage:">Map</option>-->
+                        <option value="Surreal Painting dale Abstract expressionism screen printed collage:">Surreal Painting</option>
+                        <option value="in the style of south park collage:">Cartoon</option>
+<!--                        <option value="Photograph warm fun happy cozy 35mm collage:">Cozy Photograph</option>-->
+<!--                        <option value="street art graffiti digital art cartoon letters collage:">Street Art</option>-->
+                      </select>
+                    </div>
+                    </div>
+                    <div class="text-muted font-weight-medium mt-2"> </div>
+                    <div class="form-group">
+                        <button name="submit" type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    <!-- gallery grid -->
+    <div class="container">
+     <div class="text-muted font-weight-medium mt-2"> </div>
+    <div class="row">
+        <div class="col-12">
+                        <!-- car. block -->
+                        <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                            <div class="carousel-item active">
+                              <img src= "./assets/pics/0r.png" class="d-block w-100 h-100" alt="...">
+                            </div>
+                            <div class="carousel-item">
+                              <img src= "./assets/pics/1r.png" class="d-block w-100 h-100" alt="...">
+                            </div>
+<!--                            <div class="carousel-item">-->
+<!--                              <img src= "./assets/pics/3r.png" class="d-block w-95 h-95" alt="...">-->
+<!--                            </div>-->
+                            <div class="carousel-item">
+                              <img src= "./assets/pics/first_p.png" class="d-block w-100 h-100" alt="...">
+                            </div>
+                            <div class="carousel-item">
+                              <img src= "./assets/pics/second_p.png" class="d-block w-100 h-100" alt="...">
+                            </div>
+                            <div class="carousel-item">
+                              <img src= "./assets/pics/third_p.png" class="d-block w-100 h-100" alt="...">
+                            </div>
+                            </div>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                            </button>
+                            </div>
+                    </div>
+        </div>
+    </div>
+</div>
+<div class="text-muted font-weight-medium mt-2"> </div>
+
+
+</body>
+</html>

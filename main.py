@@ -156,7 +156,7 @@ con = sqlite3.connect("temp.db")
 @app.get("/")
 async def home(request: Request):
     try:
-        return templates.TemplateResponse('index_v2.html', {"request": request})
+        return templates.TemplateResponse('index_v3.html', {"request": request})
 
     except Exception as e:
         print(e)
