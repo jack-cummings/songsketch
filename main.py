@@ -18,7 +18,9 @@ import pandas as pd
 from fastapi.responses import RedirectResponse
 from typing import Optional
 import random
-
+import smtplib
+from email.message import EmailMessage
+import stripe
 
 '''Core Functions'''
 def get_user_playlists(username, sp):
@@ -144,6 +146,29 @@ def spotify_process(playlist_id,uniqueID, style):
     df.to_sql(name=uniqueID, con=con, if_exists='replace', index=False)
     return prompt
 
+def sendEmail(pics):
+    email_address = "johnmcummings3@gmail.com"
+    email_password = os.environ['email_code']
+
+    # create email
+    msg = EmailMessage()
+    msg['Subject'] = "Song Sketch Log - success"
+    msg['From'] = email_address
+    msg['To'] = email_address
+    msg.set_content(f"Someone completed a song sketch! \n pics: {pics}")
+
+    # send email
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+        smtp.login(email_address, email_password)
+        smtp.send_message(msg)
+
+def setBasePath(mode):
+    if mode.lower() == 'dev':
+        basepath = 'http://0.0.0.0:4242'
+    elif mode.lower() == 'prod':
+        basepath = 'https://songsketch.herokuapp.com'
+    return basepath
+
 ''' APP Starts '''
 # Launch app and mount assets
 app = FastAPI()
@@ -151,7 +176,8 @@ app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 templates = Jinja2Templates(directory="templates")
 # init DB
 con = sqlite3.connect("temp.db")
-
+basepath = setBasePath(os.environ['MODE'])
+stripe.api_key = os.environ['STRIPE_KEY_PROD']
 
 @app.get("/")
 async def home(request: Request):
@@ -193,13 +219,35 @@ async def save_input(request: Request, background_tasks: BackgroundTasks):
         playlist_id = out_list[0].split('playlist')[1].split('%')[1][2:]
         uniqueID = f'uid{random.randint(0,100000)}'
         background_tasks.add_task(spotify_process, playlist_id=playlist_id, style=out_list[1], uniqueID=uniqueID)
-        response = RedirectResponse(url="/loading")
+        if out_list[-1] in os.environ['promocodes'].split(','):
+            response = RedirectResponse(url="/loading")
+        else:
+            response = RedirectResponse(url="/checkout")
         response.set_cookie("uniqueID", uniqueID)
         return response
 
     except Exception as e:
         print(e)
         return templates.TemplateResponse('error.html', {"request": request})
+
+@app.post("/checkout")
+async def checkout_5(request: Request):
+    try:
+        checkout_session = stripe.checkout.Session.create(
+            success_url=basepath + "/loading?session_id={CHECKOUT_SESSION_ID}",
+            cancel_url=basepath,
+            payment_method_types=["card"],
+            mode="payment",
+            line_items=[{
+                "price": os.environ['price'],
+                "quantity": 1
+            }],
+            )
+        return RedirectResponse(checkout_session.url, status_code=303)
+
+    except Exception as e:
+        print(e)
+        return templates.TemplateResponse('v2_error.html', {"request": request})
 
 @app.post("/loading")
 async def home(request: Request):
@@ -212,7 +260,7 @@ async def home(request: Request):
 
 
 @app.get("/final")
-async def home(request: Request, uniqueID: Optional[bytes] = Cookie(None)):
+async def home(request: Request, background_tasks: BackgroundTasks, uniqueID: Optional[bytes] = Cookie(None)):
     try:
         uniqueID = uniqueID.decode('UTF-8')
         sql = f'''select * from {uniqueID}'''
@@ -224,6 +272,7 @@ async def home(request: Request, uniqueID: Optional[bytes] = Cookie(None)):
         if prompt != 'rejected':
             pics = get_pics(prompt)
             print(pics)
+            background_tasks.add_task(sendEmail, pics=pics)
             return templates.TemplateResponse('final_gallery.html', {"request": request, 'url_1': pics[0],
                                                              'url_2': pics[1], 'url_3': pics[2],
                                                             'keywords': keywords})
