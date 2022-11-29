@@ -162,6 +162,24 @@ async def home(request: Request):
         print(e)
         return templates.TemplateResponse('error.html', {"request": request})
 
+@app.get("/pricing")
+async def home(request: Request):
+    try:
+        return templates.TemplateResponse('pricing.html', {"request": request})
+
+    except Exception as e:
+        print(e)
+        return templates.TemplateResponse('error.html', {"request": request})
+
+@app.get("/contact")
+async def home(request: Request):
+    try:
+        return templates.TemplateResponse('contact.html', {"request": request})
+
+    except Exception as e:
+        print(e)
+        return templates.TemplateResponse('error.html', {"request": request})
+
 @app.post("/save_input")
 async def save_input(request: Request, background_tasks: BackgroundTasks):
     try:
@@ -191,8 +209,6 @@ async def home(request: Request):
     except Exception as e:
         print(e)
         return templates.TemplateResponse('error.html', {"request": request})
-
-
 
 
 @app.get("/final")
