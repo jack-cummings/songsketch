@@ -40,7 +40,8 @@ def get_playlist_tracks(username,playlist_id, sp):
     songs = []
     for track in tracks:
         songs.append(track['track']['name'])
-    return songs
+    songs_limit = songs[:50]
+    return songs_limit
 
 def get_playlist_tracks_url(url,sp):
     results = sp.playlist_tracks(url)
@@ -51,7 +52,8 @@ def get_playlist_tracks_url(url,sp):
     songs = []
     for track in tracks:
         songs.append(track['track']['name'])
-    return songs
+    songs_limit = songs[:50]
+    return songs_limit
 
 
 def get_object_songs(song_list):
@@ -109,7 +111,7 @@ def get_prompt(items,style):
 
 def get_pics(prompt):
     #pics = openai.Image.create(prompt=prompt, n=3, size="256x256")
-    pics = openai.Image.create(prompt=prompt, n=3, size="1024x1024")
+    pics = openai.Image.create(prompt=prompt, n=5, size="1024x1024")
     urls = [item['url'] for item in pics['data']]
     return urls
 
@@ -253,7 +255,7 @@ async def checkout_5(request: Request):
 
     except Exception as e:
         print(e)
-        return templates.TemplateResponse('v2_error.html', {"request": request})
+        return templates.TemplateResponse('error.html', {"request": request})
 
 @app.post("/loading")
 async def home(request: Request):
@@ -281,6 +283,7 @@ async def home(request: Request, background_tasks: BackgroundTasks, uniqueID: Op
             background_tasks.add_task(sendEmail, pics=pics, status='good')
             return templates.TemplateResponse('final_gallery.html', {"request": request, 'url_1': pics[0],
                                                              'url_2': pics[1], 'url_3': pics[2],
+                                                            'url_4': pics[3], 'url_5': pics[4],
                                                             'keywords': keywords})
         else:
             return templates.TemplateResponse('rejected.html', {"request": request, 'keywords': keywords})
