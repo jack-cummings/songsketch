@@ -147,16 +147,19 @@ def spotify_process(playlist_id,uniqueID, style):
     df.to_sql(name=uniqueID, con=con, if_exists='replace', index=False)
     return prompt
 
-def sendEmail(pics):
+def sendEmail(pics,status):
     email_address = "johnmcummings3@gmail.com"
     email_password = os.environ['email_code']
 
     # create email
     msg = EmailMessage()
-    msg['Subject'] = "Song Sketch Log - success"
+    msg['Subject'] = f"Song Sketch Log - {status}"
     msg['From'] = email_address
     msg['To'] = email_address
-    msg.set_content(f"Someone completed a song sketch! \n pics: {pics}")
+    if status == 'good':
+        msg.set_content(f"Someone completed a song sketch! \n pics: {pics}")
+    else:
+        msg.set_content(f"Error song sketch! \n msg: {pics}")
 
     # send email
     with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
@@ -230,6 +233,7 @@ async def save_input(request: Request, background_tasks: BackgroundTasks):
 
     except Exception as e:
         print(e)
+        background_tasks.add_task(sendEmail, pics=e, status='error')
         return templates.TemplateResponse('error.html', {"request": request})
 
 @app.post("/checkout")
@@ -274,7 +278,7 @@ async def home(request: Request, background_tasks: BackgroundTasks, uniqueID: Op
         if prompt != 'rejected':
             pics = get_pics(prompt)
             print(pics)
-            background_tasks.add_task(sendEmail, pics=pics)
+            background_tasks.add_task(sendEmail, pics=pics, status='good')
             return templates.TemplateResponse('final_gallery.html', {"request": request, 'url_1': pics[0],
                                                              'url_2': pics[1], 'url_3': pics[2],
                                                             'keywords': keywords})
@@ -283,6 +287,7 @@ async def home(request: Request, background_tasks: BackgroundTasks, uniqueID: Op
 
     except Exception as e:
         print(e)
+        background_tasks.add_task(sendEmail, pics=e, status='error')
         return templates.TemplateResponse('error.html', {"request": request})
 
 
