@@ -95,7 +95,7 @@ def PPSongText(song_list):
     return textPP
 
 def get_prompt(items,style):
-    prompt = f'{style} of {items}'
+    prompt = f'{style} of {items} negative prompt: text,words,writing'
     openai.api_key = os.environ["openai"]
     mod_raw = openai.Moderation.create(input=prompt)
     # custom prof check
