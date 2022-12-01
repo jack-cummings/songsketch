@@ -229,7 +229,9 @@ async def save_input(request: Request, background_tasks: BackgroundTasks):
         if out_list[-1] in os.environ['promocodes'].split(','):
             response = RedirectResponse(url="/loading")
         else:
-            response = RedirectResponse(url="/checkout")
+            #response = RedirectResponse(url="/checkout")
+            # free Mode
+            response = RedirectResponse(url="/loading")
         response.set_cookie("uniqueID", uniqueID)
         return response
 
