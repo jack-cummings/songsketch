@@ -108,7 +108,8 @@ def get_prompt(items,style):
         return 'rejected'
 
 def get_pics(prompt):
-    pics = openai.Image.create(prompt=prompt, n=3, size="256x256")
+    #pics = openai.Image.create(prompt=prompt, n=3, size="256x256")
+    pics = openai.Image.create(prompt=prompt, n=3, size="1024x1024")
     urls = [item['url'] for item in pics['data']]
     return urls
 
@@ -216,7 +217,8 @@ async def save_input(request: Request, background_tasks: BackgroundTasks):
         for x in body.decode('UTF-8').split('&')[:-1]:
             out_list.append(x.split('=')[1].replace('+', ' '))
         print(out_list)
-        playlist_id = out_list[0].split('playlist')[1].split('%')[1][2:]
+        #playlist_id = out_list[0].split('playlist')[1].split('%')[1][2:]
+        playlist_id = out_list[0].split('playlist/')[1].split('?')[0]
         uniqueID = f'uid{random.randint(0,100000)}'
         background_tasks.add_task(spotify_process, playlist_id=playlist_id, style=out_list[1], uniqueID=uniqueID)
         if out_list[-1] in os.environ['promocodes'].split(','):
