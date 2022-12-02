@@ -21,6 +21,7 @@ import random
 import smtplib
 from email.message import EmailMessage
 import stripe
+import urllib.parse
 
 '''Core Functions'''
 def get_user_playlists(username, sp):
@@ -212,6 +213,15 @@ async def home(request: Request):
         print(e)
         return templates.TemplateResponse('error.html', {"request": request})
 
+@app.post("/playlist_not_found")
+async def home(request: Request):
+    try:
+        return templates.TemplateResponse('no_pl.html', {"request": request})
+
+    except Exception as e:
+        print(e)
+        return templates.TemplateResponse('error.html', {"request": request})
+
 @app.post("/save_input")
 async def save_input(request: Request, background_tasks: BackgroundTasks):
     try:
@@ -222,17 +232,37 @@ async def save_input(request: Request, background_tasks: BackgroundTasks):
         for x in body.decode('UTF-8').split('&')[:-1]:
             out_list.append(x.split('=')[1].replace('+', ' '))
         print(out_list)
-        #playlist_id = out_list[0].split('playlist')[1].split('%')[1][2:]
-        playlist_id = out_list[0].split('playlist%2F')[1].split('%3F')[0]
-        uniqueID = f'uid{random.randint(0,100000)}'
-        background_tasks.add_task(spotify_process, playlist_id=playlist_id, style=out_list[1], uniqueID=uniqueID)
-        if out_list[-1] in os.environ['promocodes'].split(','):
-            response = RedirectResponse(url="/loading")
+
+        # check if playlist accessible
+        try:
+            playlist_id = out_list[0].split('playlist%2F')[1].split('%3F')[0]
+            #playlist_id = out_list[0].split('playlist')[1].split('%')[1][2:]
+            client_id = os.environ['client_id']
+            secret = os.environ['secret']
+            sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=client_id, client_secret=secret))
+            sp.playlist_tracks(playlist_id)
+            pl_access = True
+        except:
+            pl_access = False
+        # Direct to either next step or cusotom error based on PL access
+        if pl_access:
+            # if PL access, kick off processing
+            uniqueID = f'uid{random.randint(0, 100000)}'
+            background_tasks.add_task(spotify_process, playlist_id=playlist_id, style=out_list[1], uniqueID=uniqueID)
+            if out_list[-1] in os.environ['promocodes'].split(','):
+                response = RedirectResponse(url="/loading")
+                response.set_cookie("uniqueID", uniqueID)
+            else:
+                # response = RedirectResponse(url="/checkout")
+                #response.set_cookie("uniqueID", uniqueID)
+                # free Mode
+                response = RedirectResponse(url="/loading")
+                response.set_cookie("uniqueID", uniqueID)
         else:
-            #response = RedirectResponse(url="/checkout")
-            # free Mode
-            response = RedirectResponse(url="/loading")
-        response.set_cookie("uniqueID", uniqueID)
+            # if not- pl not found error
+            response = RedirectResponse(url='/playlist_not_found')
+
+
         return response
 
     except Exception as e:
