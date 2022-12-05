@@ -213,6 +213,15 @@ async def home(request: Request):
         print(e)
         return templates.TemplateResponse('error.html', {"request": request})
 
+@app.get("/about")
+async def home(request: Request):
+    try:
+        return templates.TemplateResponse('about.html', {"request": request})
+
+    except Exception as e:
+        print(e)
+        return templates.TemplateResponse('error.html', {"request": request})
+
 @app.post("/playlist_not_found")
 async def home(request: Request):
     try:
