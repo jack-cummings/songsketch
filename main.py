@@ -21,6 +21,7 @@ import random
 import smtplib
 from email.message import EmailMessage
 import stripe
+import starlette.status as status
 import urllib.parse
 
 '''Core Functions'''
@@ -222,7 +223,7 @@ async def home(request: Request):
         print(e)
         return templates.TemplateResponse('error.html', {"request": request})
 
-@app.post("/playlist_not_found")
+@app.get("/playlist_not_found")
 async def home(request: Request):
     try:
         return templates.TemplateResponse('no_pl.html', {"request": request})
@@ -259,17 +260,17 @@ async def save_input(request: Request, background_tasks: BackgroundTasks):
             uniqueID = f'uid{random.randint(0, 100000)}'
             background_tasks.add_task(spotify_process, playlist_id=playlist_id, style=out_list[1], uniqueID=uniqueID)
             if out_list[-1] in os.environ['promocodes'].split(','):
-                response = RedirectResponse(url="/loading")
+                response = RedirectResponse(url="/loading", status_code=status.HTTP_302_FOUND)
                 response.set_cookie("uniqueID", uniqueID)
             else:
-                response = RedirectResponse(url="/checkout")
+                response = RedirectResponse(url="/checkout", status_code=status.HTTP_302_FOUND)
                 response.set_cookie("uniqueID", uniqueID)
                 # # free Mode
                 # response = RedirectResponse(url="/loading")
                 # response.set_cookie("uniqueID", uniqueID)
         else:
             # if not- pl not found error
-            response = RedirectResponse(url='/playlist_not_found')
+            response = RedirectResponse(url='/playlist_not_found', status_code=status.HTTP_302_FOUND)
 
 
         return response
@@ -279,7 +280,7 @@ async def save_input(request: Request, background_tasks: BackgroundTasks):
         background_tasks.add_task(sendEmail, pics=e, status='error')
         return templates.TemplateResponse('error.html', {"request": request})
 
-@app.post("/checkout")
+@app.get("/checkout")
 async def checkout_5(request: Request):
     try:
         checkout_session = stripe.checkout.Session.create(
@@ -298,7 +299,7 @@ async def checkout_5(request: Request):
         print(e)
         return templates.TemplateResponse('error.html', {"request": request})
 
-@app.post("/loading")
+@app.get("/loading")
 async def home(request: Request):
     try:
         return templates.TemplateResponse('loading.html', {"request": request})
