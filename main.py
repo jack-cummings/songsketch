@@ -33,7 +33,7 @@ def get_user_playlists(username, sp):
 
 
 def get_playlist_tracks(username,playlist_id, sp):
-    results = sp.user_playlist_tracks(username,playlist_id)
+    results = sp.user_playlist_tracks(username,playlist_id, limit=50)
     tracks = results['items']
     while results['next']:
         results = sp.next(results)
@@ -262,11 +262,11 @@ async def save_input(request: Request, background_tasks: BackgroundTasks):
                 response = RedirectResponse(url="/loading")
                 response.set_cookie("uniqueID", uniqueID)
             else:
-                # response = RedirectResponse(url="/checkout")
-                #response.set_cookie("uniqueID", uniqueID)
-                # free Mode
-                response = RedirectResponse(url="/loading")
+                response = RedirectResponse(url="/checkout")
                 response.set_cookie("uniqueID", uniqueID)
+                # # free Mode
+                # response = RedirectResponse(url="/loading")
+                # response.set_cookie("uniqueID", uniqueID)
         else:
             # if not- pl not found error
             response = RedirectResponse(url='/playlist_not_found')
