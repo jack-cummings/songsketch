@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request, BackgroundTasks, Response, Cookie
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-import re
+import time
 from fastapi.responses import RedirectResponse
 #from sqlalchemy import create_engine
 import traceback
@@ -9,7 +9,7 @@ import sqlite3
 import json
 import requests
 import os
-import os
+import re
 import openai
 from textblob import TextBlob
 import spotipy
@@ -91,10 +91,11 @@ def get_object_songs(song_list):
 
 def PPSongText(song_list):
     #song_list = ['First Class', 'Starting Over', 'Revival', "All Your'n", 'Rainbow', 'By and By', 'Astrovan', 'Strangers', 'You Should Probably Leave', 'Broken Halos', 'Heading South', 'Sedona', "Berry's Dream", 'The Fisherman', 'Colder Weather', 'Something in the Orange', 'Oklahoma Smokeshow', 'Heavy Eyes']
-    text = '. '.join(song_list)
-    tb = TextBlob(text)
-    textPP = ', '.join(tb.noun_phrases)
-    return textPP
+    song_list_mod = [re.sub(r'\(.*\)', '', x).replace('[remix]','').strip() for x in song_list]
+    text = '. '.join(song_list_mod)
+    # tb = TextBlob(text)
+    # textPP = ', '.join(tb.noun_phrases)
+    return text
 
 def get_prompt(items,style):
     prompt = f'{style} of {items}'
@@ -118,33 +119,31 @@ def get_pics(prompt):
     return urls
 
 def spotify_process(playlist_id,uniqueID, style):
-    # init spotify
-    client_id = os.environ['client_id']
-    secret = os.environ['secret']
-    sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=client_id, client_secret=secret))
+    try:
+        # init spotify
+        client_id = os.environ['client_id']
+        secret = os.environ['secret']
+        sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=client_id, client_secret=secret))
 
-    # # mimic user inputs
-    # username = 'the_captain_jack'
-    # playlist = 'Chilly Morning'
+        # url song retrieval
+        songs = get_playlist_tracks_url(playlist_id,sp)
+        print('songs done')
+        print(songs)
+        object_songs = get_object_songs(songs)
+        print('song classification done')
+        print('object songs:')
+        text = PPSongText(object_songs)
+        print(text)
 
-    # # playlsit retrieval
-    # playlists = get_user_playlists(username,sp)
-    # print('playlists done')
-    #
-    # # Song retrieval and Processing
-    # songs = get_playlist_tracks(username, playlists[playlist],sp)
+        prompt = get_prompt(text,style)
+    except:
+        # write to table
+        df = pd.DataFrame([[uniqueID, 'error', 'error']], columns=['uniqueID', 'prompt', 'keywords'])
+        con = sqlite3.connect("temp.db")
+        df.to_sql(name=uniqueID, con=con, if_exists='replace', index=False)
+        return prompt
 
-    # url song retrieval
-    songs = get_playlist_tracks_url(playlist_id,sp)
-    print('songs done')
-    print(songs)
-    object_songs = get_object_songs(songs)
-    print('song classification done')
-    print('object songs:')
-    text = PPSongText(object_songs)
-    print(text)
 
-    prompt = get_prompt(text,style)
     # write to table
     df = pd.DataFrame([[uniqueID,prompt,text]], columns=['uniqueID','prompt','keywords'])
     con = sqlite3.connect("temp.db")
@@ -300,13 +299,28 @@ async def checkout_5(request: Request):
         return templates.TemplateResponse('error.html', {"request": request})
 
 @app.get("/loading")
-async def home(request: Request):
+async def home(request: Request,background_tasks: BackgroundTasks, uniqueID: Optional[bytes] = Cookie(None)):
     try:
-        return templates.TemplateResponse('loading.html', {"request": request})
+        time.sleep(5)
+        uniqueID = uniqueID.decode('UTF-8')
+        sql = f'''select * from {uniqueID}'''
+        df = pd.read_sql(sql, con=con)
+        if df['prompt'].values[0] != 'error':
+            #return templates.TemplateResponse('art_ready.html', {"request": request})
+            response = RedirectResponse(url='/final', status_code=status.HTTP_302_FOUND)
+            return response
+        else:
+            try:
+                background_tasks.add_task(sendEmail, pics='error in loading flow', status='error')
+                return templates.TemplateResponse('error.html', {"request": request})
+            except Exception as e:
+                print(e)
+                return templates.TemplateResponse('loading.html', {"request": request})
 
     except Exception as e:
         print(e)
-        return templates.TemplateResponse('error.html', {"request": request})
+        background_tasks.add_task(sendEmail, pics='error in loading flow', status='error')
+        return templates.TemplateResponse('loading.html', {"request": request})
 
 
 @app.get("/final")
