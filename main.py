@@ -104,7 +104,7 @@ def get_prompt(items,style):
     # custom prof check
     f = open("assets/profane_words.json", 'r')
     bad_words = json.load(f)
-    bad_words_pattern = ' | '.join(bad_words)
+    bad_words_pattern = '|'.join(bad_words)
     prompt = re.sub(bad_words_pattern,'',prompt)
     print(f'prompt: {prompt}')
     if mod_raw['results'][0]['flagged'] == False:
