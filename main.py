@@ -178,7 +178,7 @@ def setBasePath(mode):
     if mode.lower() == 'dev':
         basepath = 'http://0.0.0.0:4242'
     elif mode.lower() == 'prod':
-        basepath = 'https://songsketch.herokuapp.com'
+        basepath = 'https://www.songsketch.com'
     return basepath
 
 ''' APP Starts '''
