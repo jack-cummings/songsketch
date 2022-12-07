@@ -336,7 +336,7 @@ async def home(request: Request, background_tasks: BackgroundTasks, uniqueID: Op
         if prompt != 'rejected':
             pics = get_pics(prompt)
             print(pics)
-            background_tasks.add_task(sendEmail, pics=pics, status='good')
+            background_tasks.add_task(sendEmail, pics=keywords+' '+pics, status='good')
             return templates.TemplateResponse('final_gallery.html', {"request": request, 'url_1': pics[0],
                                                              'url_2': pics[1], 'url_3': pics[2],
                                                             'url_4': pics[3], 'url_5': pics[4],
