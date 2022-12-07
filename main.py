@@ -263,11 +263,11 @@ async def save_input(request: Request, background_tasks: BackgroundTasks):
                 response = RedirectResponse(url="/loading", status_code=status.HTTP_302_FOUND)
                 response.set_cookie("uniqueID", uniqueID)
             else:
-                response = RedirectResponse(url="/checkout", status_code=status.HTTP_302_FOUND)
-                response.set_cookie("uniqueID", uniqueID)
-                # # free Mode
-                # response = RedirectResponse(url="/loading")
+                # response = RedirectResponse(url="/checkout", status_code=status.HTTP_302_FOUND)
                 # response.set_cookie("uniqueID", uniqueID)
+                # # free Mode
+                response = RedirectResponse(url="/loading", status_code=status.HTTP_302_FOUND)
+                response.set_cookie("uniqueID", uniqueID)
         else:
             # if not- pl not found error
             response = RedirectResponse(url='/playlist_not_found', status_code=status.HTTP_302_FOUND)
