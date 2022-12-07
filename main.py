@@ -91,7 +91,12 @@ def get_object_songs(song_list):
 
 def PPSongText(song_list):
     #song_list = ['First Class', 'Starting Over', 'Revival', "All Your'n", 'Rainbow', 'By and By', 'Astrovan', 'Strangers', 'You Should Probably Leave', 'Broken Halos', 'Heading South', 'Sedona', "Berry's Dream", 'The Fisherman', 'Colder Weather', 'Something in the Orange', 'Oklahoma Smokeshow', 'Heavy Eyes']
-    song_list_mod = [re.sub(r'\(.*\)', '', x).replace('[remix]','').strip() for x in song_list]
+    # # custom prof check
+    f = open("assets/profane_words.json", 'r')
+    bad_words = json.load(f)
+    bad_words_pattern = ' | '.join(bad_words)
+    clean_songs = [re.sub(bad_words_pattern,'',' '+x.lower()) for x in song_list]
+    song_list_mod = [re.sub(r'\(.*\)', '', x).replace('[remix]','').strip() for x in clean_songs]
     text = '. '.join(song_list_mod)
     # tb = TextBlob(text)
     # textPP = ', '.join(tb.noun_phrases)
@@ -101,11 +106,11 @@ def get_prompt(items,style):
     prompt = f'{style} of {items}'
     openai.api_key = os.environ["openai"]
     mod_raw = openai.Moderation.create(input=prompt)
-    # custom prof check
-    f = open("assets/profane_words.json", 'r')
-    bad_words = json.load(f)
-    bad_words_pattern = '|'.join(bad_words)
-    prompt = re.sub(bad_words_pattern,'',prompt)
+    # # custom prof check
+    # f = open("assets/profane_words.json", 'r')
+    # bad_words = json.load(f)
+    # bad_words_pattern = ' | '.join(bad_words)
+    # prompt = re.sub(bad_words_pattern,'',prompt.lower())
     print(f'prompt: {prompt}')
     if mod_raw['results'][0]['flagged'] == False:
         return prompt
