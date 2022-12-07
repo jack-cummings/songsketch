@@ -319,7 +319,7 @@ async def home(request: Request,background_tasks: BackgroundTasks, uniqueID: Opt
 
     except Exception as e:
         print(e)
-        background_tasks.add_task(sendEmail, pics='error in loading flow', status='error')
+        background_tasks.add_task(sendEmail, pics="prompt wasn't ready, kicking to loading, if no good in a few minutes treat as error", status='error')
         return templates.TemplateResponse('loading.html', {"request": request})
 
 
