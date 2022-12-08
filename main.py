@@ -341,6 +341,9 @@ async def home(request: Request, background_tasks: BackgroundTasks, uniqueID: Op
         if prompt != 'rejected':
             pics = get_pics(prompt)
             print(pics)
+            # write to image table
+            df = pd.DataFrame([pics], columns=['url1','url2','url3','url4','url5'])
+            df.to_sql(name=f'{uniqueID}_urls', con=con, if_exists='replace', index=False)
             background_tasks.add_task(sendEmail, pics=pics, status='good')
             return templates.TemplateResponse('final_gallery.html', {"request": request, 'url_1': pics[0],
                                                              'url_2': pics[1], 'url_3': pics[2],
@@ -353,6 +356,38 @@ async def home(request: Request, background_tasks: BackgroundTasks, uniqueID: Op
         print(e)
         background_tasks.add_task(sendEmail, pics=e, status='error')
         return templates.TemplateResponse('error.html', {"request": request})
+
+@app.get("/get_prints")
+async def home(request: Request, uniqueID: Optional[bytes] = Cookie(None)):
+    try:
+        uniqueID = uniqueID.decode('UTF-8')
+        sql = f'''select * from {uniqueID}_urls'''
+        df = pd.read_sql(sql, con=con)
+        pics = df.values[0]
+
+        return templates.TemplateResponse('get_prints.html', {"request": request,'url1': pics[0],
+                                                             'url2': pics[1], 'url3': pics[2],
+                                                            'url4': pics[3]})
+
+    except Exception as e:
+        print(e)
+        return templates.TemplateResponse('error.html', {"request": request})
+
+@app.post("/receive_prints")
+async def home(request: Request):
+    try:
+        # Collect User Input
+        body = await request.body()
+        out_list = []
+        for x in body.decode('UTF-8').split('&')[:-1]:
+            out_list.append(x.split('=')[1].replace('+', ' '))
+        print(out_list)
+        return templates.TemplateResponse('index_v3.html', {"request": request})
+
+    except Exception as e:
+        print(e)
+        return templates.TemplateResponse('error.html', {"request": request})
+
 
 
 if __name__ == '__main__':

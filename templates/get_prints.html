@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>SongSketch</title>
+
+    <!-- Bootstrap CSS / Color Scheme -->
+    <link rel="stylesheet" href="assets/css/lux.css" id="theme-color">
+</head>
+<body>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+<!--start navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">Song Sketch ai</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarColor01">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link active" href="/">Home
+            <span class="visually-hidden">(current)</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">about</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/contact">Contact</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/pricing">Pricing</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<!-- end Navbar -->
+
+<!--Generic section-->
+    <div class="container">
+            <div class="col-12 mx-auto">
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="card-title">Order Prints</h2>
+                            <form method="post" action="receive_prints">
+                                <div class="form-group">
+                                  <legend>
+                                    Select an Image
+                                  </legend>
+                                  <input type="radio" name="pic" class="sr-only" id="pic1" value = {{ url1 }}>
+                                  <label for="pic1">
+                                    <img src= {{ url1 }} width="50" height="50" alt="pic1">
+                                  </label>
+                                  <input type="radio" name="pic" class="sr-only" id="pic2" value = {{ url2 }}>
+                                  <label for="pic2">
+                                    <img src= {{ url2 }} width="50" height="50" alt="pic2">
+                                  </label>
+                                  <input type="radio" name="pic" class="sr-only" id="pic3" value = {{ url3 }}>
+                                  <label for="pic3">
+                                    <img src= {{ url3 }} width="50" height="50" alt="pic3">
+                                  </label>
+                                  <input type="radio" name="pic" class="sr-only" id="pic4" value = {{ url4 }}>
+                                  <label for="pic4">
+                                    <img src= '{{ url4 }}' width="50" height="50" alt="pic4">
+                                  </label>
+                                    <input type="radio" name="pic" class="sr-only" id="pic5" value = {{ url5 }}>
+                                  <label for="pic5">
+                                    <img src= '{{ url5 }}' width="50" height="50" alt="pic5">
+                                  </label>
+                                </div>
+                                 <div class="text-muted font-weight-medium mt-2"> </div>
+                                <div class="form-group">
+                                    <button name="order" type="submit" class="btn btn-primary">order</button>
+                                </div>
+                            </form>
+
+
+        </div>
+  </div>
+</div>
+
+
+
+<!--scroll to top-->
+<div class="scroll-top">
+    <i class="fa fa-angle-up" aria-hidden="true"></i>
+</div>
+
+    </div>
+
+
+</body>
+</html>
+
+<!--                            <div class="text-muted font-weight-medium mt-2"> </div>-->
+<!--                            <p class="text-muted"> Select an image</p>-->
+<!--                            <div class="container mx-1">-->
+<!--                                <div class="container mx-1"><img src="https://oaidalleapiprodscus.blob.core.windows.net/private/org-NAgLLNzpg2AcYFGcr2sq19XB/user-EUqajdtXNu9Ujzmia8LPiXt1/img-Fw9kiGfy11u1atqbwQkP3ftY.png?st=2022-12-08T18%3A35%3A44Z&se=2022-12-08T20%3A35%3A44Z&sp=r&sv=2021-08-06&sr=b&rscd=inline&rsct=image/png&skoid=6aaadede-4fb3-4698-a8f6-684d7786b067&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2022-12-08T16%3A54%3A13Z&ske=2022-12-09T16%3A54%3A13Z&sks=b&skv=2021-08-06&sig=uRaZTcHXfhJX/rupXNuyF%2BTsw0NneyFCX0q1swrrYEs%3D" width="200" height="200"><button class="btn btn-primary">Button</button></div>-->
+<!--                                <div class="container mx-1"><img src="https://oaidalleapiprodscus.blob.core.windows.net/private/org-NAgLLNzpg2AcYFGcr2sq19XB/user-EUqajdtXNu9Ujzmia8LPiXt1/img-l7eeA4aiPP34FsQJBpq8WaiP.png?st=2022-12-08T18%3A35%3A49Z&se=2022-12-08T20%3A35%3A49Z&sp=r&sv=2021-08-06&sr=b&rscd=inline&rsct=image/png&skoid=6aaadede-4fb3-4698-a8f6-684d7786b067&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2022-12-08T16%3A54%3A13Z&ske=2022-12-09T16%3A54%3A13Z&sks=b&skv=2021-08-06&sig=dh7BIG9EazXjTRKf3owQgvNHqQ3h1fuyvRkIQyyH%2BuQ%3D" width="200" height="200"><button class="btn btn-primary">Button</button></div>-->
+<!--                            </div>-->
