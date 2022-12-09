@@ -22,7 +22,7 @@ import smtplib
 from email.message import EmailMessage
 import stripe
 import starlette.status as status
-import urllib.parse
+from urllib.parse import unquote
 
 '''Core Functions'''
 def get_user_playlists(username, sp):
@@ -263,15 +263,17 @@ async def save_input(request: Request, background_tasks: BackgroundTasks):
             # if PL access, kick off processing
             uniqueID = f'uid{random.randint(0, 100000)}'
             background_tasks.add_task(spotify_process, playlist_id=playlist_id, style=out_list[1], uniqueID=uniqueID)
-            if out_list[-1] in os.environ['promocodes'].split(','):
-                response = RedirectResponse(url="/loading", status_code=status.HTTP_302_FOUND)
-                response.set_cookie("uniqueID", uniqueID)
-            else:
-                # response = RedirectResponse(url="/checkout", status_code=status.HTTP_302_FOUND)
-                # response.set_cookie("uniqueID", uniqueID)
-                # # free Mode
-                response = RedirectResponse(url="/loading", status_code=status.HTTP_302_FOUND)
-                response.set_cookie("uniqueID", uniqueID)
+            response = RedirectResponse(url="/loading", status_code=status.HTTP_302_FOUND)
+            response.set_cookie("uniqueID", uniqueID)
+
+            # # Uncomment this to re-enable promocode logic
+            # if out_list[-1] in os.environ['promocodes'].split(','):
+            #     response = RedirectResponse(url="/loading", status_code=status.HTTP_302_FOUND)
+            #     response.set_cookie("uniqueID", uniqueID)
+            # else:
+            #     response = RedirectResponse(url="/checkout", status_code=status.HTTP_302_FOUND)
+            #     response.set_cookie("uniqueID", uniqueID)
+
         else:
             # if not- pl not found error
             response = RedirectResponse(url='/playlist_not_found', status_code=status.HTTP_302_FOUND)
@@ -323,7 +325,7 @@ async def home(request: Request,background_tasks: BackgroundTasks, uniqueID: Opt
                 return templates.TemplateResponse('loading.html', {"request": request})
 
     except Exception as e:
-        print(e)
+        print(f'table not ready {e}')
         background_tasks.add_task(sendEmail, pics="prompt wasn't ready, kicking to loading, if no good in a few minutes treat as error", status='error')
         return templates.TemplateResponse('loading.html', {"request": request})
 
@@ -367,7 +369,7 @@ async def home(request: Request, uniqueID: Optional[bytes] = Cookie(None)):
 
         return templates.TemplateResponse('get_prints.html', {"request": request,'url1': pics[0],
                                                              'url2': pics[1], 'url3': pics[2],
-                                                            'url4': pics[3]})
+                                                            'url4': pics[3], 'url5': pics[4]})
 
     except Exception as e:
         print(e)
@@ -382,12 +384,13 @@ async def home(request: Request):
         for x in body.decode('UTF-8').split('&')[:-1]:
             out_list.append(x.split('=')[1].replace('+', ' '))
         print(out_list)
-        return templates.TemplateResponse('index_v3.html', {"request": request})
+        url = unquote(out_list[0])
+
+        return templates.TemplateResponse('order_conf.html', {"request": request, "url":url})
 
     except Exception as e:
         print(e)
         return templates.TemplateResponse('error.html', {"request": request})
-
 
 
 if __name__ == '__main__':
