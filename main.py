@@ -188,7 +188,6 @@ def saveImage(imageUrl, UID):
     ts= datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
     path = f"./assets/print_pics/print_{UID}_{ts}.png"
     urllib.request.urlretrieve(imageUrl, path)
-    #img = urllib.request.urlretrieve(imageUrl, f"./assets/print_pics/test.png")
     img = Image.open(path)
     logo = Image.open('./assets/print_pics/logo.png')
     img.paste(logo, (0, 985))
@@ -356,9 +355,8 @@ async def home(request: Request, background_tasks: BackgroundTasks, uniqueID: Op
 
         # Image retrieval
         if prompt != 'rejected':
-            # pics = get_pics(prompt)
-            # print(pics)
-            pics = ['https://oaidalleapiprodscus.blob.core.windows.net/private/org-NAgLLNzpg2AcYFGcr2sq19XB/user-EUqajdtXNu9Ujzmia8LPiXt1/img-gFT5YwJ6auZOlSFYFwjZ3JaJ.png?st=2022-12-11T20%3A44%3A52Z&se=2022-12-11T22%3A44%3A52Z&sp=r&sv=2021-08-06&sr=b&rscd=inline&rsct=image/png&skoid=6aaadede-4fb3-4698-a8f6-684d7786b067&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2022-12-11T14%3A30%3A29Z&ske=2022-12-12T14%3A30%3A29Z&sks=b&skv=2021-08-06&sig=hs9iWHQTTU%2BX1gM5UX1Q2BP1aHElG3o4szE4bMqJyZw%3D', 'https://oaidalleapiprodscus.blob.core.windows.net/private/org-NAgLLNzpg2AcYFGcr2sq19XB/user-EUqajdtXNu9Ujzmia8LPiXt1/img-doU6XvkuncJGtz9HOrFtFaEL.png?st=2022-12-11T20%3A44%3A52Z&se=2022-12-11T22%3A44%3A52Z&sp=r&sv=2021-08-06&sr=b&rscd=inline&rsct=image/png&skoid=6aaadede-4fb3-4698-a8f6-684d7786b067&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2022-12-11T14%3A30%3A29Z&ske=2022-12-12T14%3A30%3A29Z&sks=b&skv=2021-08-06&sig=NYXpP1JDFec5goVLyBMl66T8gYXFTHZ/WX6z1Bgoc5w%3D', 'https://oaidalleapiprodscus.blob.core.windows.net/private/org-NAgLLNzpg2AcYFGcr2sq19XB/user-EUqajdtXNu9Ujzmia8LPiXt1/img-ByToSSFE3ySMSPQGV9nLuFSQ.png?st=2022-12-11T20%3A44%3A52Z&se=2022-12-11T22%3A44%3A52Z&sp=r&sv=2021-08-06&sr=b&rscd=inline&rsct=image/png&skoid=6aaadede-4fb3-4698-a8f6-684d7786b067&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2022-12-11T14%3A30%3A29Z&ske=2022-12-12T14%3A30%3A29Z&sks=b&skv=2021-08-06&sig=dBdv5eWYWTiRrZLH/k483pWfT51vExN4pz9CtJLf6tg%3D', 'https://oaidalleapiprodscus.blob.core.windows.net/private/org-NAgLLNzpg2AcYFGcr2sq19XB/user-EUqajdtXNu9Ujzmia8LPiXt1/img-ec3QwAEoUIEUac8uLG94uCco.png?st=2022-12-11T20%3A44%3A52Z&se=2022-12-11T22%3A44%3A52Z&sp=r&sv=2021-08-06&sr=b&rscd=inline&rsct=image/png&skoid=6aaadede-4fb3-4698-a8f6-684d7786b067&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2022-12-11T14%3A30%3A29Z&ske=2022-12-12T14%3A30%3A29Z&sks=b&skv=2021-08-06&sig=tSnaWiHSkKWrj/HrP4DM6rAQgJtaV5/ZL34%2Bld78YQU%3D', 'https://oaidalleapiprodscus.blob.core.windows.net/private/org-NAgLLNzpg2AcYFGcr2sq19XB/user-EUqajdtXNu9Ujzmia8LPiXt1/img-IqhjZBFJQdN50hAVD2tIDgox.png?st=2022-12-11T20%3A44%3A52Z&se=2022-12-11T22%3A44%3A52Z&sp=r&sv=2021-08-06&sr=b&rscd=inline&rsct=image/png&skoid=6aaadede-4fb3-4698-a8f6-684d7786b067&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2022-12-11T14%3A30%3A29Z&ske=2022-12-12T14%3A30%3A29Z&sks=b&skv=2021-08-06&sig=sPrZQMBJf%2BSavgQlaOcQJ8IasgYlh9IswJ27wT6ivAg%3D']
+            pics = get_pics(prompt)
+            print(pics)
             # write to image table
             df = pd.DataFrame([pics], columns=['url1','url2','url3','url4','url5'])
             df.to_sql(name=f'{uniqueID}_urls', con=con, if_exists='replace', index=False)
