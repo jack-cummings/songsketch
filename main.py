@@ -181,7 +181,7 @@ def setBasePath(mode):
     if mode.lower() == 'dev':
         basepath = 'http://0.0.0.0:4242'
     elif mode.lower() == 'prod':
-        basepath = 'https://www.songsketch.com'
+        basepath = 'https://www.songsketchai.com'
     return basepath
 
 def saveImage(imageUrl, UID):
