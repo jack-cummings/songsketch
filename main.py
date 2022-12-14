@@ -190,7 +190,7 @@ def saveImage(imageUrl, UID):
     urllib.request.urlretrieve(imageUrl, path)
     img = Image.open(path)
     logo = Image.open('./assets/print_pics/logo.png')
-    img.paste(logo, (0, 985))
+    img.paste(logo, (0, 3160))
     img.save(path)
     return path
 
@@ -399,9 +399,11 @@ async def home(request: Request, uniqueID: Optional[bytes] = Cookie(None)):
             out_list.append(x.split('=')[1].replace('+', ' '))
         #print(out_list)
         url = unquote(out_list[0])
+        r = requests.post("https://api.deepai.org/api/torch-srgan", data={'image': url, },headers={'api-key': os.environ['deep_ai_key']})
+        sr_url = (r.json()['output_url'])
         # print(url)
         uid = uniqueID.decode('UTF-8')
-        path = saveImage(url,uid)
+        path = saveImage(sr_url,uid)
         url = f'{basepath}{path[1:]}'
 
         return templates.TemplateResponse('order_conf.html', {"request": request, "path":path, 'url':url})
