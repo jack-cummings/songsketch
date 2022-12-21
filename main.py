@@ -277,7 +277,11 @@ async def save_input(request: Request, background_tasks: BackgroundTasks):
             # if PL access, kick off processing
             uniqueID = f'uid{random.randint(0, 100000)}'
             background_tasks.add_task(spotify_process, playlist_id=playlist_id, style=out_list[1], uniqueID=uniqueID)
-            response = RedirectResponse(url="/loading", status_code=status.HTTP_302_FOUND)
+            # uncomment this for free mode
+            # response = RedirectResponse(url="/loading", status_code=status.HTTP_302_FOUND)
+            # response.set_cookie("uniqueID", uniqueID)
+            #Uncomment this to use checkout logic
+            response = RedirectResponse(url="/checkout", status_code=status.HTTP_302_FOUND)
             response.set_cookie("uniqueID", uniqueID)
 
             # # Uncomment this to re-enable promocode logic
