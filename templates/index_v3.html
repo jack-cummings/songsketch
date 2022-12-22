@@ -10,9 +10,41 @@
     <link rel="stylesheet" href="assets/css/lux.css" id="theme-color">
     <link rel="icon" href="assets/print_pics/logo.png">
 
+
+</script>
 </head>
 <body>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+<!-- import jquery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<!-- Bootstrap Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+<!--Modal JS Script -->
+<script type="text/javascript">
+    window.onload = () => {
+        $('#onload').modal('show');
+    }
+</script>
+
+<div class="modal fade" id="onload" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"> <!-- Add this line to your code -->
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Accept Cookies</h5>
+            </div>
+            <div class="modal-body">
+                This site uses cookies in place of a login, none of your information is collected, but they are required to continue. Click "accept" or dismiss this to accept.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Accept</button>
+            </div>
+        </div>
+    </div>
+</div> <!-- And the relavant closing div tag -->
+
+
 
 <!--start navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
