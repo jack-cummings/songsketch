@@ -281,16 +281,16 @@ async def save_input(request: Request, background_tasks: BackgroundTasks):
             # response = RedirectResponse(url="/loading", status_code=status.HTTP_302_FOUND)
             # response.set_cookie("uniqueID", uniqueID)
             #Uncomment this to use checkout logic
-            response = RedirectResponse(url="/checkout", status_code=status.HTTP_302_FOUND)
-            response.set_cookie("uniqueID", uniqueID)
+            # response = RedirectResponse(url="/checkout", status_code=status.HTTP_302_FOUND)
+            # response.set_cookie("uniqueID", uniqueID)
 
-            # # Uncomment this to re-enable promocode logic
-            # if out_list[-1] in os.environ['promocodes'].split(','):
-            #     response = RedirectResponse(url="/loading", status_code=status.HTTP_302_FOUND)
-            #     response.set_cookie("uniqueID", uniqueID)
-            # else:
-            #     response = RedirectResponse(url="/checkout", status_code=status.HTTP_302_FOUND)
-            #     response.set_cookie("uniqueID", uniqueID)
+            # Uncomment this to re-enable promocode logic
+            if out_list[-1] in os.environ['promocodes'].split(','):
+                response = RedirectResponse(url="/loading", status_code=status.HTTP_302_FOUND)
+                response.set_cookie("uniqueID", uniqueID)
+            else:
+                response = RedirectResponse(url="/checkout", status_code=status.HTTP_302_FOUND)
+                response.set_cookie("uniqueID", uniqueID)
 
         else:
             # if not- pl not found error
