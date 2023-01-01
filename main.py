@@ -371,7 +371,7 @@ async def home(request: Request, background_tasks: BackgroundTasks, uniqueID: Op
         if prompt != 'rejected':
             pics = get_pics(prompt)
             print(pics)
-            email_msg = pics.append(keywords)
+            email_msg = pics+[keywords]
             # write to image table
             df = pd.DataFrame([pics], columns=['url1','url2','url3','url4','url5'])
             df.to_sql(name=f'{uniqueID}_urls', con=con, if_exists='replace', index=False)
