@@ -371,10 +371,11 @@ async def home(request: Request, background_tasks: BackgroundTasks, uniqueID: Op
         if prompt != 'rejected':
             pics = get_pics(prompt)
             print(pics)
+            email_msg = pics.append(keywords)
             # write to image table
             df = pd.DataFrame([pics], columns=['url1','url2','url3','url4','url5'])
             df.to_sql(name=f'{uniqueID}_urls', con=con, if_exists='replace', index=False)
-            background_tasks.add_task(sendEmail, pics=pics, status='good')
+            background_tasks.add_task(sendEmail, pics=email_msg, status='good')
             return templates.TemplateResponse('final_gallery.html', {"request": request, 'url_1': pics[0],
                                                              'url_2': pics[1], 'url_3': pics[2],
                                                             'url_4': pics[3], 'url_5': pics[4],
