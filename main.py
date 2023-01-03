@@ -298,6 +298,9 @@ async def save_input(request: Request, background_tasks: BackgroundTasks):
             if out_list[-1] in os.environ['promocodes'].split(','):
                 response = RedirectResponse(url="/loading", status_code=status.HTTP_302_FOUND)
                 response.set_cookie("uniqueID", uniqueID)
+            if out_list[-1] in os.environ['discount_codes'].split(','):
+                response = RedirectResponse(url="/checkout_discount", status_code=status.HTTP_302_FOUND)
+                response.set_cookie("uniqueID", uniqueID)
             else:
                 response = RedirectResponse(url="/checkout", status_code=status.HTTP_302_FOUND)
                 response.set_cookie("uniqueID", uniqueID)
@@ -324,6 +327,25 @@ async def checkout_5(request: Request):
             mode="payment",
             line_items=[{
                 "price": os.environ['price'],
+                "quantity": 1
+            }],
+            )
+        return RedirectResponse(checkout_session.url, status_code=303)
+
+    except Exception as e:
+        print(e)
+        return templates.TemplateResponse('error.html', {"request": request})
+
+@app.get("/checkout_discount")
+async def checkout_5(request: Request):
+    try:
+        checkout_session = stripe.checkout.Session.create(
+            success_url=basepath + "/loading?session_id={CHECKOUT_SESSION_ID}",
+            cancel_url=basepath,
+            payment_method_types=["card"],
+            mode="payment",
+            line_items=[{
+                "price": os.environ['price_discount'],
                 "quantity": 1
             }],
             )
