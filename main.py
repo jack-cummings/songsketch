@@ -99,7 +99,7 @@ def PPSongText(song_list):
     bad_words = json.load(f)
     bad_words_pattern = ' | '.join(bad_words)
     clean_songs = [re.sub(bad_words_pattern,'',' '+x.lower()) for x in song_list]
-    song_list_mod = [re.sub(r'\(.*\)', '', x).replace('[remix]','').strip() for x in clean_songs]
+    song_list_mod = [re.sub(r'\(.*\)', '', x.lower()).replace('[remix]','').strip() for x in clean_songs]
     text = '. '.join(song_list_mod)
     # tb = TextBlob(text)
     # textPP = ', '.join(tb.noun_phrases)
