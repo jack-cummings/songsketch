@@ -57,7 +57,10 @@ def get_playlist_tracks_url(url,sp):
         tracks.extend(results['items'])
     songs = []
     for track in tracks:
-        songs.append(track['track']['name'])
+        try:
+            songs.append(track['track']['name'])
+        except:
+            pass
     songs_limit = songs[:50]
     return songs_limit
 
