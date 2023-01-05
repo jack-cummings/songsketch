@@ -26,6 +26,7 @@ from urllib.parse import unquote
 import urllib.request
 from PIL import Image
 from datetime import datetime
+from random import sample
 
 '''Core Functions'''
 def get_user_playlists(username, sp):
@@ -62,33 +63,36 @@ def get_playlist_tracks_url(url,sp):
 
 
 def get_object_songs(song_list):
-    # #classifier = pipeline("zero-shot-classification", model = "./model")
-    # classifier = pipeline("zero-shot-classification")
-    # # candidate_labels = ["abstract", "concrete"]
-    # candidate_labels = ["object", "idea"]
-    #preds = classifier(song_list, candidate_labels)
-    headers = {"Authorization": f"Bearer {os.environ['hg_api_token']}"}
-    API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-mnli"
-    def query(payload):
-        data = json.dumps(payload)
-        response = requests.request("POST", API_URL, headers=headers, data=data)
-        return json.loads(response.content.decode("utf-8"))
-    data = query(
-        {
-            "inputs": song_list,
-            "parameters": {"candidate_labels": ["object", "abstract"]},
-        }
-    )
-    object_songs = []
-    iterator = 0
-    for pred in data:
-        if pred['labels'][0] == 'object':
-            #if pred['scores'][0] > .7:
-            object_songs.append([song_list[iterator],pred['scores'][0]])
-        iterator = iterator + 1
-    df = pd.DataFrame(object_songs, columns = ['song','object_score']).sort_values('object_score', ascending=False)
-    #head_len = int(round(df.shape[0]*.5,0))
-    top_object_songs = df.head(5)['song'].to_list()
+    try:
+        # #classifier = pipeline("zero-shot-classification", model = "./model")
+        # classifier = pipeline("zero-shot-classification")
+        # # candidate_labels = ["abstract", "concrete"]
+        # candidate_labels = ["object", "idea"]
+        #preds = classifier(song_list, candidate_labels)
+        headers = {"Authorization": f"Bearer {os.environ['hg_api_token']}"}
+        API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-mnli"
+        def query(payload):
+            data = json.dumps(payload)
+            response = requests.request("POST", API_URL, headers=headers, data=data)
+            return json.loads(response.content.decode("utf-8"))
+        data = query(
+            {
+                "inputs": song_list,
+                "parameters": {"candidate_labels": ["object", "abstract"]},
+            }
+        )
+        object_songs = []
+        iterator = 0
+        for pred in data:
+            if pred['labels'][0] == 'object':
+                #if pred['scores'][0] > .7:
+                object_songs.append([song_list[iterator],pred['scores'][0]])
+            iterator = iterator + 1
+        df = pd.DataFrame(object_songs, columns = ['song','object_score']).sort_values('object_score', ascending=False)
+        #head_len = int(round(df.shape[0]*.5,0))
+        top_object_songs = df.head(5)['song'].to_list()
+    except:
+        top_object_songs = sample(song_list,5)
     return top_object_songs
 
 
