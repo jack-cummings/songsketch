@@ -92,7 +92,10 @@ def get_object_songs(song_list):
         #head_len = int(round(df.shape[0]*.5,0))
         top_object_songs = df.head(5)['song'].to_list()
     except:
-        top_object_songs = sample(song_list,5)
+        if len(song_list) > 4:
+            top_object_songs = sample(song_list,5)
+        else:
+            top_object_songs = song_list
     return top_object_songs
 
 
