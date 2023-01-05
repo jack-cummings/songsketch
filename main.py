@@ -298,7 +298,7 @@ async def save_input(request: Request, background_tasks: BackgroundTasks):
             if out_list[-1] in os.environ['promocodes'].split(','):
                 response = RedirectResponse(url="/loading", status_code=status.HTTP_302_FOUND)
                 response.set_cookie("uniqueID", uniqueID)
-            if out_list[-1] in os.environ['discount_codes'].split(','):
+            elif out_list[-1] in os.environ['discount_codes'].split(','):
                 response = RedirectResponse(url="/checkout_discount", status_code=status.HTTP_302_FOUND)
                 response.set_cookie("uniqueID", uniqueID)
             else:
