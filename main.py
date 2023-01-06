@@ -216,7 +216,7 @@ def IGPost(imageUrls, UID, songs):
         logo = Image.open('./assets/print_pics/logo.png')
         img.paste(logo, (0, 970))
         img.save(path)
-        ig_image_paths.append(f'{basepath}{path[1:]}')
+        ig_image_paths.append(path)
     # post to IG
     username = 'songsketchai'
     password = os.environ['ig_p']
@@ -442,7 +442,7 @@ async def home(request: Request, background_tasks: BackgroundTasks, uniqueID: Op
             # write to image table
             df = pd.DataFrame([pics], columns=['url1','url2','url3','url4','url5'])
             df.to_sql(name=f'{uniqueID}_urls', con=con, if_exists='replace', index=False)
-            background_tasks.add_task(IGPost, imageUrls=pics, UID= 'uniqueID', songs= keywords)
+            background_tasks.add_task(IGPost, imageUrls=pics, UID= uniqueID, songs= keywords)
             background_tasks.add_task(sendEmail, pics=email_msg, status='good')
             return templates.TemplateResponse('final_gallery.html', {"request": request, 'url_1': pics[0],
                                                              'url_2': pics[1], 'url_3': pics[2],
