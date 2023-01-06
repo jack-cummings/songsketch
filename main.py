@@ -27,6 +27,7 @@ import urllib.request
 from PIL import Image
 from datetime import datetime
 from random import sample
+from instagrapi import Client
 
 '''Core Functions'''
 def get_user_playlists(username, sp):
@@ -203,6 +204,34 @@ def saveImage(imageUrl, UID):
     img.paste(logo, (0, 3160))
     img.save(path)
     return path
+
+def IGPost(imageUrls, UID, songs):
+    # prep images
+    ig_image_paths = []
+    for imageUrl in imageUrls:
+        ts= datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
+        path = f"./assets/IG_pics/print_{UID}_{ts}.png"
+        urllib.request.urlretrieve(imageUrl, path)
+        img = Image.open(path)
+        logo = Image.open('./assets/IG_pics/print_pics/logo.png')
+        img.paste(logo, (0, 999))
+        img.save(path)
+        ig_image_paths.append(path)
+    # post to IG
+    username = 'songsketchai'
+    password = os.environ['ig_p']
+
+    bot = Client()
+    bot.login(username, password)
+
+    album_path = ig_image_paths
+    text = f"New Song Sketch Alert! Check out this artwork inspired by the songs: {songs.replace('.', ',')}. Go to the link in bio to turn your playlists into art!" \
+           f"#music #musicart #spotify #spotifywrapped #art #ai #aiart #openai #wallart #playlist #digitalart #aiartcommunity #aiartist #ai_art_community"
+
+    bot.album_upload(
+        album_path,
+        caption=text)
+    return
 
 
 ''' APP Starts '''
@@ -410,6 +439,7 @@ async def home(request: Request, background_tasks: BackgroundTasks, uniqueID: Op
             # write to image table
             df = pd.DataFrame([pics], columns=['url1','url2','url3','url4','url5'])
             df.to_sql(name=f'{uniqueID}_urls', con=con, if_exists='replace', index=False)
+            background_tasks.add_task(IGPost, imageUrls=pics, UID= 'uniqueID', songs= keywords)
             background_tasks.add_task(sendEmail, pics=email_msg, status='good')
             return templates.TemplateResponse('final_gallery.html', {"request": request, 'url_1': pics[0],
                                                              'url_2': pics[1], 'url_3': pics[2],
