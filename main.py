@@ -210,11 +210,11 @@ def IGPost(imageUrls, UID, songs):
     ig_image_paths = []
     for imageUrl in imageUrls:
         ts= datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
-        path = f"./assets/IG_pics/print_{UID}_{ts}.png"
+        path = f"./assets/IG_pics/print_{UID}_{ts}.jpg"
         urllib.request.urlretrieve(imageUrl, path)
         img = Image.open(path)
-        logo = Image.open('./assets/IG_pics/print_pics/logo.png')
-        img.paste(logo, (0, 999))
+        logo = Image.open('./assets/print_pics/logo.png')
+        img.paste(logo, (0, 970))
         img.save(path)
         ig_image_paths.append(path)
     # post to IG
@@ -224,13 +224,16 @@ def IGPost(imageUrls, UID, songs):
     bot = Client()
     bot.login(username, password)
 
+    print(ig_image_paths)
     album_path = ig_image_paths
-    text = f"New Song Sketch Alert! Check out this artwork inspired by the songs: {songs.replace('.', ',')}. Go to the link in bio to turn your playlists into art!" \
+    text = f"New Song Sketch Alert! Check out this artwork inspired by the songs: {songs.replace('.', ',')}. Go to the link in bio to turn your playlists into art!      " \
+           f"                                                                                             " \
            f"#music #musicart #spotify #spotifywrapped #art #ai #aiart #openai #wallart #playlist #digitalart #aiartcommunity #aiartist #ai_art_community"
 
     bot.album_upload(
-        album_path,
-        caption=text)
+         album_path,
+         caption=text)
+    print('IG Post Done')
     return
 
 
