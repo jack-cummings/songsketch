@@ -216,7 +216,7 @@ def IGPost(imageUrls, UID, songs):
         logo = Image.open('./assets/print_pics/logo.png')
         img.paste(logo, (0, 970))
         img.save(path)
-        ig_image_paths.append(path)
+        ig_image_paths.append(f'{basepath}{path[1:]}')
     # post to IG
     username = 'songsketchai'
     password = os.environ['ig_p']
