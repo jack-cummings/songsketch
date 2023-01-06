@@ -108,9 +108,9 @@ def PPSongText(song_list):
     f = open("assets/profane_words.json", 'r')
     bad_words = json.load(f)
     bad_words_pattern = ' | '.join(bad_words)
-    clean_songs = [re.sub(bad_words_pattern,'',' '+f'{x.lower()} ') for x in song_list]
+    clean_songs = [re.sub(bad_words_pattern,'****',f' {x.lower()} ') for x in song_list]
     song_list_mod = [re.sub(r'\(.*\)', '', x.lower()).replace('[remix]','').strip() for x in clean_songs]
-    text = '. '.join(song_list_mod)
+    text = '. '.join([x.capitalize() for x in song_list_mod])
     # tb = TextBlob(text)
     # textPP = ', '.join(tb.noun_phrases)
     return text
