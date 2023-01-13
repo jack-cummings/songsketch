@@ -196,7 +196,7 @@ def setBasePath(mode):
     return basepath
 
 def saveImage(imageUrl, UID):
-    ts= datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
+    ts= datetime.now().strftime("%m_%d_%Y_%H_%M_%S_%f")
     path = f"./assets/print_pics/print_{UID}_{ts}.png"
     urllib.request.urlretrieve(imageUrl, path)
     img = Image.open(path)
@@ -209,7 +209,7 @@ def IGPost(imageUrls, UID, songs):
     # prep images
     ig_image_paths = []
     for imageUrl in imageUrls:
-        ts= datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
+        ts= datetime.now().strftime("%m_%d_%Y_%H_%M_%S_%f")
         path = f"./assets/IG_pics/print_{UID}_{ts}.jpg"
         urllib.request.urlretrieve(imageUrl, path)
         img = Image.open(path)
